@@ -1,7 +1,15 @@
 provider "google" {
-  credentials = "${file("account.json")}"
+#  credentials = "${file("account.json")}"
   project     = "${var.project}"
   region      = "${var.region}"
+}
+
+terraform {
+  backend "gcs" {
+    bucket = "glds-terraform-remote-state-storage"
+    path = "wsk/terraform.tfstate"
+    project = "glds-gcp"
+  }
 }
 
 resource "google_container_cluster" "primary" {
