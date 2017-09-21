@@ -15,8 +15,8 @@ terraform {
 resource "google_container_cluster" "primary" {
   name           = "terraform-test"
   zone		 = "us-west1-a"
-  initial_node_count = 3
-  node_version = "1.6.7"
+  initial_node_count = "${var.node_count}"
+  node_version = "1.6.9"
   node_config {
     machine_type = "n1-standard-1"
     labels {
@@ -27,5 +27,8 @@ resource "google_container_cluster" "primary" {
 }
 output "cluster_id" {
  value = "${google_container_cluster.primary.self_link}"
+}
+output "endpoint" {
+  value = "${google_container_cluster.primary.endpoint}"
 }
 
