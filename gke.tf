@@ -11,12 +11,14 @@ terraform {
     project = "glds-gcp"
   }
 }
-
+data "google_container_engine_versions" "uswest1a" {
+  zone = "us-west1-a"
+}
 resource "google_container_cluster" "primary" {
-  name           = "terraform-test"
+  name           = "terraform-gke"
   zone		 = "us-west1-a"
   initial_node_count = "${var.node_count}"
-  node_version = "1.6.9"
+  node_version = "${data.google_container_engine_versions.uswest1a.latest_node_version}"
   node_config {
     machine_type = "n1-standard-1"
     labels {
@@ -28,7 +30,9 @@ resource "google_container_cluster" "primary" {
 output "cluster_id" {
  value = "${google_container_cluster.primary.self_link}"
 }
+output "cluser_version" { 
+ value = "${google_container_cluster.primary.node_version}"
+}
 output "endpoint" {
   value = "${google_container_cluster.primary.endpoint}"
 }
-
