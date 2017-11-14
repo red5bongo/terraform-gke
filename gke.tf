@@ -15,10 +15,11 @@ data "google_container_engine_versions" "uswest1a" {
   zone = "us-west1-a"
 }
 resource "google_container_cluster" "primary" {
-  name           = "terraform-gke"
+  name           = "${var.cluster_name}"
   zone		 = "us-west1-a"
   initial_node_count = "${var.node_count}"
-  node_version = "${data.google_container_engine_versions.uswest1a.latest_node_version}"
+#  node_version = "${data.google_container_engine_versions.uswest1a.latest_node_version}"
+  node_version = "${var.node_version}"
   node_config {
     machine_type = "n1-standard-1"
     labels {
