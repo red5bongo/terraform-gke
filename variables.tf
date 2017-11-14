@@ -1,7 +1,4 @@
-variable "project" {
-  default = "glds-gcp"
-}
-variable "region" {
-  default = "us-west1"
-}
+variable "project" {}
+variable "region" {}
 variable "node_count" {}
+variable "cluster_name" {}
