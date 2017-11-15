@@ -6,8 +6,8 @@ provider "google" {
 
 terraform {
   backend "gcs" {
-    bucket = "glds-terraform-remote-state-storage"
-    path = "wsk/terraform.tfstate"
+    bucket = "gke-terraform-remote-state-storage"
+    path = "cluster/terraform.tfstate"
     project = "glds-gcp"
   }
 }
@@ -15,24 +15,25 @@ data "google_container_engine_versions" "uswest1a" {
   zone = "us-west1-a"
 }
 
-resource "google_container_node_pool" "np" {
-  name = "${var.cluster_name}-node-pool"
-  zone = "${var.zone}"
-  cluster = "${google_container_cluster.primary.name}"
-  initial_node_count = "${var.node_count}"
-  autoscaling {
-    min_node_count = "${var.min_nodes}"
-    max_node_count = "${var.max_nodes}"
-  }
-}
+#resource "google_container_node_pool" "np" {
+#  name = "${var.cluster_name}-node-pool"
+#  zone = "${var.zone}"
+#  cluster = "${google_container_cluster.primary.name}"
+#  initial_node_count = "${var.node_count}"
+#  autoscaling {
+#    min_node_count = "${var.min_nodes}"
+#    max_node_count = "${var.max_nodes}"
+#  }
+#}
 
 resource "google_container_cluster" "primary" {
   name     = "${var.cluster_name}"
   zone		 = "${var.zone}"
 #  node_pool = ["${google_container_node_pool.np.name}"]
-  initial_node_count = "${var.node_count}"
+  initial_node_count = "1"
 #  node_version = "${data.google_container_engine_versions.uswest1a.latest_node_version}"
   node_version = "${var.node_version}"
+  min_master_version = "${var.node_version}"
   node_config {
     machine_type = "n1-standard-1"
     oauth_scopes = [
@@ -45,5 +46,9 @@ resource "google_container_cluster" "primary" {
       cluster = "terraform"
     }
     tags = ["terraform", "blah"]
+  }
+  # enable autoscaling
+  provisioner "local-exec" {
+    command = "gcloud container clusters update ${var.cluster_name} --enable-autoscaling --min-nodes=${var.min_nodes} --max-nodes=${var.max_nodes} --project='${var.project}' --zone='${var.zone}'"
   }
 }
