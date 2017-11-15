@@ -6,8 +6,8 @@ provider "google" {
 
 terraform {
   backend "gcs" {
-    bucket = "gke-terraform-remote-state-storage"
-    path = "cluster/terraform.tfstate"
+    bucket = "glds-terraform-remote-state-storage"
+    path = "gke/terraform.tfstate"
     project = "glds-gcp"
   }
 }
@@ -47,8 +47,8 @@ resource "google_container_cluster" "primary" {
     }
     tags = ["terraform", "blah"]
   }
-  # enable autoscaling
+#  enable autoscaling
   provisioner "local-exec" {
-    command = "gcloud container clusters update ${var.cluster_name} --enable-autoscaling --min-nodes=${var.min_nodes} --max-nodes=${var.max_nodes} --project='${var.project}' --zone='${var.zone}'"
+    command = "gcloud container clusters update ${var.cluster_name} --enable-autoscaling --min-nodes=${var.min_nodes} --max-nodes=${var.max_nodes} --zone ${var.zone} --project=${var.project}"
   }
 }
